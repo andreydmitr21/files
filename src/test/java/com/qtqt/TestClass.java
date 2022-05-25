@@ -14,6 +14,7 @@ import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.sql.SQLOutput;
 import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
@@ -90,16 +91,19 @@ public class TestClass {
     public void zipParsingTest() throws Exception {
         String docxFile="q.docx";
         try (
-                ZipInputStream inps = new ZipInputStream(
-                        cl.getResourceAsStream("zip/спряжение глаголов.docx.zip"))) {
+                ZipInputStream zis = new ZipInputStream(
+                        new BufferedInputStream(
+                                new FileInputStream("src/test/resources/zip/спряжение глаголов.docx.zip"))
+                )) {
             ZipEntry entry;
-            ZipInputStream zipIn = new ZipInputStream(inps);
-            while ((entry = inps.getNextEntry()) != null) {
+
+            while ((entry = zis.getNextEntry()) != null) {
                 if (entry.getName().contentEquals("спряжение глаголов.docx")) {
                     // read file
                     String entryFileName = entry.getName();
-                    Path entryPath = Paths.get("/src/test/java/resources/TMP/",docxFile);
+                    Path entryPath = Paths.get("src/test/resources/TMP/",entryFileName);
                     System.out.println(entryPath.toString());
+                    System.out.println(entry.getSize());
 
                     // Create the entry file by creating necessary directories
                     try {
@@ -116,7 +120,12 @@ public class TestClass {
                             new FileOutputStream(entryPath.toString()))) {
                         byte[] buffer = new byte[1024];
                         int count;
-                        while ((count = zipIn.read(buffer)) != -1) {
+                        while (true){
+                            count = zis.read(buffer);
+                            if (count== -1) {
+                                break;
+                            }
+
                             bos.write(buffer, 0, count);
                         }
                     }
@@ -124,7 +133,7 @@ public class TestClass {
                     return;
                 }
             }
-            throw new Exception("no file "+myZip+ "inside zip");
+            throw new Exception("no file inside zip");
         }
     }
 }
