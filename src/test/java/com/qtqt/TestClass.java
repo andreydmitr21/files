@@ -89,7 +89,6 @@ public class TestClass {
 
     @Test
     public void zipParsingTest() throws Exception {
-        String docxFile="q.docx";
         try (
                 ZipInputStream zis = new ZipInputStream(
                         new BufferedInputStream(
@@ -101,15 +100,14 @@ public class TestClass {
                 if (entry.getName().contentEquals("спряжение глаголов.docx")) {
                     // read file
                     String entryFileName = entry.getName();
-                    Path entryPath = Paths.get("src/test/resources/TMP/",entryFileName);
+                    Path entryPath = Paths.get("src/test/resources/TMP/", entryFileName);
                     System.out.println(entryPath.toString());
                     System.out.println(entry.getSize());
 
                     // Create the entry file by creating necessary directories
                     try {
                         delete(entryPath);
-                    } catch (Exception e)
-                    {
+                    } catch (Exception e) {
 
                     }
                     createFile(entryPath);
@@ -120,12 +118,7 @@ public class TestClass {
                             new FileOutputStream(entryPath.toString()))) {
                         byte[] buffer = new byte[1024];
                         int count;
-                        while (true){
-                            count = zis.read(buffer);
-                            if (count== -1) {
-                                break;
-                            }
-
+                        while ((count = zis.read(buffer)) != -1) {
                             bos.write(buffer, 0, count);
                         }
                     }
